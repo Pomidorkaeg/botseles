@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация и Конструктор Бота</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #005f77;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Страница регистрации -->
+<div class="container" id="registrationContainer">
+    <h1>Регистрация бота</h1>
+    <form id="registrationForm">
+        <div class="form-group">
+            <label for="username">Имя пользователя:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="botToken">Токен бота:</label>
+            <input type="text" id="botToken" name="botToken" required>
+        </div>
+        <button type="submit" class="button">Зарегистрировать</button>
+    </form>
+</div>
+
+<!-- Конструктор бота -->
+<div class="container" id="builderContainer" style="display: none;">
+    <h1>Конструктор бота</h1>
+    <button class="button" id="createButton">Создать кнопку</button>
+    <button class="button" id="runBotButton">Запустить бота</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    // Обработчик отправки формы регистрации
+    document.getElementById('registrationForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const botToken = document.getElementById('botToken').value;
+
+        // Отправка данных на сервер для регистрации
+        console.log("Регистрация:", username, botToken);
+
+        // Показываем следующий этап
+        document.getElementById('registrationContainer').style.display = 'none';
+        document.getElementById('builderContainer').style.display = 'block';
+    });
+
+    // Обработчик для кнопки "Создать кнопку"
+    document.getElementById('createButton').addEventListener('click', function() {
+        const command = prompt("Введите команду, например, /start:");
+        const text = prompt("Введите текст, который отобразится в Telegram:");
+
+        if (command && text) {
+            // Отправка команды и текста на сервер для создания кнопки
+            console.log("Создание кнопки:", command, text);
+
+            // Отображение успешного сообщения
+            document.getElementById('result').innerHTML = `
+                Кнопка с командой <b>${command}</b> была успешно создана!<br>
+                Текст, который будет отображаться: <b>${text}</b>
+            `;
+        }
+    });
+
+    document.getElementById('runBotButton').addEventListener('click', function() {
+    const botToken = document.getElementById('botToken').value;
+
+    // Отправка запроса на сервер для запуска бота
+    fetch('http://localhost:8080/run_bot', {  // Убедитесь, что URL правильный
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            botToken: botToken
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('result').innerHTML = data.message;
+    })
+    .catch(error => {
+        document.getElementById('result').innerHTML = 'Ошибка при запуске бота: ' + error.message;
+    });
+});
+
+</script>
+
+</body>
+</html>
